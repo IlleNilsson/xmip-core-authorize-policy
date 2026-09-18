@@ -1,12 +1,6 @@
 # xmip-core-authorize-policy
 
-Authorize by policy: decides by a declarative policy document in the estate's own TOML; a transport-layer policy. A technology of
-[xmip-core-authorize](https://github.com/IlleNilsson/xmip-core-authorize).
-
-Declared and not yet written; `architecture.toml` carries the maturity. When
-it is written it implements `Authorizer`, one mechanism at one gate (ADR-0050).
-What it may depend on is `repository-model.md` section 4 and ADR-0044: its
-capability, and no sibling.
+Authorization by a policy document in the estate's own TOML: statements that permit or deny by who, what and where, deny winning, an unknown key refused at load. A technology of [xmip-core-authorize](https://github.com/IlleNilsson/xmip-core-authorize).
 
 ## Toolchain
 
