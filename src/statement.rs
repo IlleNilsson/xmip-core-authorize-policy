@@ -106,20 +106,13 @@ impl Statement {
         let artifact = self
             .artifact
             .as_ref()
-            .is_none_or(|pattern| names(pattern, &attempt.artifact));
+            .is_none_or(|pattern| authorize::pattern::matches(pattern, &attempt.artifact));
         let location = self.location.as_ref().is_none_or(|pattern| {
-            attempt.action != Action::Process && names(pattern, &attempt.artifact)
+            attempt.action != Action::Process
+                && authorize::pattern::matches(pattern, &attempt.artifact)
         });
 
         artifact && location
-    }
-}
-
-/// A name, or every name under a prefix when the pattern ends in `*`.
-fn names(pattern: &str, name: &str) -> bool {
-    match pattern.strip_suffix('*') {
-        Some(prefix) => name.starts_with(prefix),
-        None => pattern == name,
     }
 }
 
