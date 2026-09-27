@@ -89,10 +89,10 @@ impl Statement {
             .party
             .is_none_or(|party| accountable.party_id == Some(party));
         let claim = self.claim.as_ref().is_none_or(|claim| {
-            std::iter::once(accountable)
-                .chain(identity.message.as_ref())
-                .flat_map(|held| held.evidence.iter())
-                .any(|(name, value)| *name == claim.name && *value == claim.value)
+            identity.held().any(|held| {
+                held.evidence_values(&claim.name)
+                    .any(|value| value == claim.value)
+            })
         });
 
         mechanism && party && claim
