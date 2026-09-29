@@ -123,11 +123,11 @@ mod tests {
 
     const DOCUMENT: &str = r#"
         [[statement]]
-        name = "partners-receive"
+        name = "parties-receive"
         effect = "permit"
         mechanism = "mutual-tls"
         action = "receive"
-        location = "partner-*"
+        location = "party-*"
 
         [[statement]]
         name = "party-seven-sends-billing"
@@ -143,12 +143,12 @@ mod tests {
         action = "send"
     "#;
 
-    fn partner(employment: &str) -> IdentityFacts {
+    fn party(employment: &str) -> IdentityFacts {
         IdentityFacts::evaluate(
             Alignment::None,
             AuthenticatedIdentity::new(
                 mechanism::mutual_tls(),
-                "CN=partner-x.example",
+                "CN=party-x.example",
                 Established::Passed,
                 Verified::Proven,
             )
@@ -164,10 +164,8 @@ mod tests {
 
     #[test]
     fn a_permitting_statement_that_applies_allows() {
-        let decision = document().decide(
-            &partner("staff"),
-            &Attempt::new(Action::Receive, "partner-x"),
-        );
+        let decision =
+            document().decide(&party("staff"), &Attempt::new(Action::Receive, "party-x"));
 
         assert_eq!(decision, Some(Decision::Allowed));
         assert_eq!(document().name(), "policy");
@@ -180,10 +178,7 @@ mod tests {
         // Party 7 may send Billing, and the statement saying so comes first;
         // the contractor statement after it still refuses.
         let decision = document()
-            .decide(
-                &partner("contractor"),
-                &Attempt::new(Action::Send, "Billing"),
-            )
+            .decide(&party("contractor"), &Attempt::new(Action::Send, "Billing"))
             .expect("an opinion");
 
         assert_eq!(
@@ -191,7 +186,7 @@ mod tests {
             "denied by policy: statement 'contractors-never-send' denies send on 'Billing'"
         );
         assert_eq!(
-            document().decide(&partner("staff"), &Attempt::new(Action::Send, "Billing")),
+            document().decide(&party("staff"), &Attempt::new(Action::Send, "Billing")),
             Some(Decision::Allowed)
         );
     }
@@ -199,16 +194,13 @@ mod tests {
     #[test]
     fn nothing_applying_is_no_opinion() {
         assert_eq!(
-            document().decide(
-                &partner("staff"),
-                &Attempt::new(Action::Process, "Approval")
-            ),
+            document().decide(&party("staff"), &Attempt::new(Action::Process, "Approval")),
             None
         );
         assert_eq!(
             Document::load("")
                 .expect("an empty document loads")
-                .decide(&partner("staff"), &Attempt::new(Action::Send, "Billing")),
+                .decide(&party("staff"), &Attempt::new(Action::Send, "Billing")),
             None
         );
     }

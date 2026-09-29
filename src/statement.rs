@@ -34,13 +34,13 @@ pub struct Claim {
 ///
 /// ```toml
 /// [[statement]]
-/// name = "partners-receive"
+/// name = "parties-receive"
 /// effect = "permit"
 /// mechanism = "mutual-tls"                         # who
 /// party = "00000000-0000-0000-0000-000000000007"
 /// claim = { name = "department", value = "edi" }
 /// action = "receive"                               # what
-/// location = "partner-*"                           # where
+/// location = "party-*"                           # where
 /// ```
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq)]
 #[serde(deny_unknown_fields)]
@@ -137,12 +137,12 @@ mod tests {
     use context::{Alignment, AuthenticatedIdentity, Verified};
     use xcore::{Established, mechanism};
 
-    fn partner() -> IdentityFacts {
+    fn party() -> IdentityFacts {
         IdentityFacts::evaluate(
             Alignment::None,
             AuthenticatedIdentity::new(
                 mechanism::mutual_tls(),
-                "CN=partner-x.example",
+                "CN=party-x.example",
                 Established::Passed,
                 Verified::Proven,
             )
@@ -160,21 +160,21 @@ mod tests {
     fn every_key_that_is_there_must_match_and_a_key_left_out_matches_everything() {
         let narrow = statement(
             r#"
-            name = "partners-receive"
+            name = "parties-receive"
             effect = "permit"
             mechanism = "mutual-tls"
             party = "00000000-0000-0000-0000-000000000007"
             claim = { name = "department", value = "edi" }
             action = "receive"
-            location = "partner-*"
+            location = "party-*"
             "#,
         );
         let wide = statement("name = \"everything\"\neffect = \"deny\"");
 
-        assert!(narrow.applies(&partner(), &Attempt::new(Action::Receive, "partner-x")));
-        assert!(!narrow.applies(&partner(), &Attempt::new(Action::Send, "partner-x")));
-        assert!(!narrow.applies(&partner(), &Attempt::new(Action::Receive, "Billing")));
-        assert!(wide.applies(&partner(), &Attempt::new(Action::Process, "Approval")));
+        assert!(narrow.applies(&party(), &Attempt::new(Action::Receive, "party-x")));
+        assert!(!narrow.applies(&party(), &Attempt::new(Action::Send, "party-x")));
+        assert!(!narrow.applies(&party(), &Attempt::new(Action::Receive, "Billing")));
+        assert!(wide.applies(&party(), &Attempt::new(Action::Process, "Approval")));
         assert_eq!(wide.effect, Effect::Deny);
     }
 
@@ -187,11 +187,11 @@ mod tests {
         let other_claim = statement(
             "name = \"c\"\neffect = \"permit\"\nclaim = { name = \"department\", value = \"hr\" }",
         );
-        let attempt = Attempt::new(Action::Receive, "partner-x");
+        let attempt = Attempt::new(Action::Receive, "party-x");
 
-        assert!(!other_party.applies(&partner(), &attempt));
-        assert!(!other_mechanism.applies(&partner(), &attempt));
-        assert!(!other_claim.applies(&partner(), &attempt));
+        assert!(!other_party.applies(&party(), &attempt));
+        assert!(!other_mechanism.applies(&party(), &attempt));
+        assert!(!other_claim.applies(&party(), &attempt));
     }
 
     #[test]
@@ -199,9 +199,9 @@ mod tests {
         let exact = statement("name = \"a\"\neffect = \"permit\"\nartifact = \"Billing\"");
         let under = statement("name = \"b\"\neffect = \"permit\"\nlocation = \"Billing*\"");
 
-        assert!(exact.applies(&partner(), &Attempt::new(Action::Process, "Billing")));
-        assert!(!exact.applies(&partner(), &Attempt::new(Action::Process, "Billing-EU")));
-        assert!(under.applies(&partner(), &Attempt::new(Action::Send, "Billing-EU")));
-        assert!(!under.applies(&partner(), &Attempt::new(Action::Process, "Billing-EU")));
+        assert!(exact.applies(&party(), &Attempt::new(Action::Process, "Billing")));
+        assert!(!exact.applies(&party(), &Attempt::new(Action::Process, "Billing-EU")));
+        assert!(under.applies(&party(), &Attempt::new(Action::Send, "Billing-EU")));
+        assert!(!under.applies(&party(), &Attempt::new(Action::Process, "Billing-EU")));
     }
 }
