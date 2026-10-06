@@ -66,7 +66,7 @@ pub struct Statement {
     #[serde(default)]
     pub artifact: Option<String>,
     /// Where, by Location: as `artifact`, and only where the attempt
-    /// receives or sends, because an Xmip Process is not a Location.
+    /// receives or sends, because a Work Process is not a Location.
     #[serde(default)]
     pub location: Option<String>,
 }
