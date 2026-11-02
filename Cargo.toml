@@ -24,7 +24,7 @@ xcore = { package = "xmip-core", git = "https://github.com/IlleNilsson/xmip-core
 # The document is TOML and its shape is a serde one, as everywhere in the
 # estate; deny_unknown_fields is what refuses a key nobody reads.
 serde = { version = "1", features = ["derive"] }
-toml = "0.9"
+toml = "1"
 
 [lints.rust]
 unsafe_code = "forbid"
