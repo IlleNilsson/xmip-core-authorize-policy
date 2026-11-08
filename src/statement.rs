@@ -171,10 +171,10 @@ mod tests {
         );
         let wide = statement("name = \"everything\"\neffect = \"deny\"");
 
-        assert!(narrow.applies(&party(), &Attempt::new(Action::Receive, "party-x")));
-        assert!(!narrow.applies(&party(), &Attempt::new(Action::Send, "party-x")));
-        assert!(!narrow.applies(&party(), &Attempt::new(Action::Receive, "Billing")));
-        assert!(wide.applies(&party(), &Attempt::new(Action::Process, "Approval")));
+        assert!(narrow.applies(&party(), &Attempt::now(Action::Receive, "party-x")));
+        assert!(!narrow.applies(&party(), &Attempt::now(Action::Send, "party-x")));
+        assert!(!narrow.applies(&party(), &Attempt::now(Action::Receive, "Billing")));
+        assert!(wide.applies(&party(), &Attempt::now(Action::Process, "Approval")));
         assert_eq!(wide.effect, Effect::Deny);
     }
 
@@ -187,7 +187,7 @@ mod tests {
         let other_claim = statement(
             "name = \"c\"\neffect = \"permit\"\nclaim = { name = \"department\", value = \"hr\" }",
         );
-        let attempt = Attempt::new(Action::Receive, "party-x");
+        let attempt = Attempt::now(Action::Receive, "party-x");
 
         assert!(!other_party.applies(&party(), &attempt));
         assert!(!other_mechanism.applies(&party(), &attempt));
@@ -199,9 +199,9 @@ mod tests {
         let exact = statement("name = \"a\"\neffect = \"permit\"\nartifact = \"Billing\"");
         let under = statement("name = \"b\"\neffect = \"permit\"\nlocation = \"Billing*\"");
 
-        assert!(exact.applies(&party(), &Attempt::new(Action::Process, "Billing")));
-        assert!(!exact.applies(&party(), &Attempt::new(Action::Process, "Billing-EU")));
-        assert!(under.applies(&party(), &Attempt::new(Action::Send, "Billing-EU")));
-        assert!(!under.applies(&party(), &Attempt::new(Action::Process, "Billing-EU")));
+        assert!(exact.applies(&party(), &Attempt::now(Action::Process, "Billing")));
+        assert!(!exact.applies(&party(), &Attempt::now(Action::Process, "Billing-EU")));
+        assert!(under.applies(&party(), &Attempt::now(Action::Send, "Billing-EU")));
+        assert!(!under.applies(&party(), &Attempt::now(Action::Process, "Billing-EU")));
     }
 }

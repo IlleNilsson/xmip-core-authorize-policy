@@ -165,7 +165,7 @@ mod tests {
     #[test]
     fn a_permitting_statement_that_applies_allows() {
         let decision =
-            document().decide(&party("staff"), &Attempt::new(Action::Receive, "party-x"));
+            document().decide(&party("staff"), &Attempt::now(Action::Receive, "party-x"));
 
         assert_eq!(decision, Some(Decision::Allowed));
         assert_eq!(document().name(), "policy");
@@ -178,7 +178,7 @@ mod tests {
         // Party 7 may send Billing, and the statement saying so comes first;
         // the contractor statement after it still refuses.
         let decision = document()
-            .decide(&party("contractor"), &Attempt::new(Action::Send, "Billing"))
+            .decide(&party("contractor"), &Attempt::now(Action::Send, "Billing"))
             .expect("an opinion");
 
         assert_eq!(
@@ -186,7 +186,7 @@ mod tests {
             "denied by policy: statement 'contractors-never-send' denies send on 'Billing'"
         );
         assert_eq!(
-            document().decide(&party("staff"), &Attempt::new(Action::Send, "Billing")),
+            document().decide(&party("staff"), &Attempt::now(Action::Send, "Billing")),
             Some(Decision::Allowed)
         );
     }
@@ -194,13 +194,13 @@ mod tests {
     #[test]
     fn nothing_applying_is_no_opinion() {
         assert_eq!(
-            document().decide(&party("staff"), &Attempt::new(Action::Process, "Approval")),
+            document().decide(&party("staff"), &Attempt::now(Action::Process, "Approval")),
             None
         );
         assert_eq!(
             Document::load("")
                 .expect("an empty document loads")
-                .decide(&party("staff"), &Attempt::new(Action::Send, "Billing")),
+                .decide(&party("staff"), &Attempt::now(Action::Send, "Billing")),
             None
         );
     }
