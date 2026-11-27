@@ -1,11 +1,11 @@
 [package]
 name = "xmip-core-authorize-policy"
-version = "0.1.0"
-edition = "2024"
-license = "AGPL-3.0-or-later"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
 repository = "https://github.com/IlleNilsson/xmip-core-authorize-policy"
 description = "Authorization by a policy document in the estate's own TOML: statements that permit or deny by who, what and where, deny winning, an unknown key refused at load. A xmip-core-authorize technology."
-publish = false
+publish.workspace = true
 
 [lib]
 path = "src/lib.rs"
@@ -23,13 +23,5 @@ xcore = { package = "xmip-core", git = "https://github.com/IlleNilsson/xmip-core
 serde = { version = "1", features = ["derive"] }
 toml = "1.2.1"
 
-[lints.rust]
-unsafe_code = "forbid"
-
-[lints.clippy]
-too_many_lines = "warn"
-pedantic = { level = "warn", priority = -1 }
-missing_errors_doc = "warn"
-missing_panics_doc = "warn"
-unwrap_used = "warn"
-expect_used = "allow"
+[lints]
+workspace = true
